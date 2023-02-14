@@ -1,0 +1,15 @@
+{% for post in page_obj %}
+    <div class="pos">
+        <a href = "{%url 'profile' post.author.id %}">{{post.author}}</a>
+        {% if user.is_authenticated %}
+            {% if request.user == post.author %}
+            <br/><button class="btn btn-sm btn-outline-primary">Edit</button>
+            {% endif %}
+        {% endif %}
+        <div class="content">
+            <span class="cont">{{post.content}}</span>
+            <br/>{{post.created}} <span class="postid">{{post.id}}</span>
+            <br/>,  {{post.liked}}
+        </div>
+    </div>
+{% endfor %}

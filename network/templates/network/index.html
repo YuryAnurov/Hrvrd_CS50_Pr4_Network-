@@ -1,0 +1,79 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+<!--Profile page-->
+{% if followBtn %}
+<div class="pos">
+    <h4>{{userpage}}</h4>
+    Followers: {{followers}}
+    <br/>Follows: {{follows}}
+    {% if user.is_authenticated and request.user != userpage %}
+        <form action="{%url 'follow' userpage.id %}" method="get">
+            <input type = "submit" value={{followBtn}}>
+        </form>
+    {% endif %}
+</div>
+
+<!--New post-->
+{% elif user.is_authenticated %}
+<div id="red" class="pos" style="caret-color: auto;">
+    <h4>New Post</h4>
+    <form action="{% url 'post' %}" method="post">
+        {% csrf_token %}
+        <textarea name="content" style="width: 94vw"></textarea>
+        <br/>
+        <input type = "submit" value="Post">
+    </form>
+</div>
+{% endif %}
+
+<!--Posts-->
+{% for post in page_obj %}
+    <div class="pos">
+        <a href = "{%url 'profile' post.author.id %}">{{post.author}}</a>
+        {% if user.is_authenticated %}
+            {% if request.user == post.author %}
+            <br/><button class="btn btn-sm btn-outline-primary">Edit</button>
+            {% endif %}
+        {% endif %}
+        <div class="content">
+            <span class="cont">{{post.content}}</span>
+            <br/>{{post.created}} <span class="postid">{{post.id}}</span>
+            {% if user.is_authenticated %}
+                {% if request.user in post.liked.all %}
+                <i class="bi-heart" style="display:none;">{{post.liked.all.count}}</i><i class="bi bi-heart-fill" style="display:block;">{{post.liked.all.count}}</i>
+                {% else %}
+                <i class="bi-heart" style="display:block;">{{post.liked.all.count}}</i><i class="bi bi-heart-fill" style="display:none;">{{post.liked.all.count}}</i>
+                {% endif %}
+            {% else %}
+                <i class="bi-heart" style="display:block;">{{post.liked.all.count}}</i><i class="bi bi-heart-fill" style="display:none;">{{post.liked.all.count}}</i>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+
+
+<!--Pagination  Django's Paginator + Bootstrap's Pagination included-->
+<nav aria-label="Posts">
+    <ul class="pagination" style="padding: 10px;">
+
+    {% if page_obj.has_previous %}
+    <!--<a href="?page=1">&laquo; first</a>-->
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+    {% endif %}
+
+        <li class="page-item active" aria-current="page"><a class="page-link" href="#">{{ page_obj.number }} <span class="sr-only">(current)</span></a></li>
+        
+    {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+<!--    <a >last &raquo;</a>-->
+    {% endif %}
+
+    </ul>
+  </nav>
+
+
+{% endblock %}
