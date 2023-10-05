@@ -12,9 +12,6 @@ class Post(models.Model):
     created = models.DateTimeField(default=timezone.now)
     content = models.TextField()
     liked = models.ManyToManyField('User', related_name='likes', blank=True)
+
     def __str__(self):
         return f'{self.content} made by {self.author}, liked:{self.liked.all().count()}'
-
-
-
-
